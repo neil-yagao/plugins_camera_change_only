@@ -297,6 +297,9 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   StreamSubscription<dynamic>? _eventSubscription;
   _VideoAppLifeCycleObserver? _lifeCycleObserver;
 
+  /// add to notify player start to play and paused
+  void Function(bool)? playOrPauseHandler;
+
   /// The id of a texture that hasn't been initialized.
   @visibleForTesting
   static const int kUninitializedTextureId = -1;
@@ -473,7 +476,6 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     }
     if (value.isPlaying) {
       await _videoPlayerPlatform.play(_textureId);
-
       // Cancel previous timer.
       _timer?.cancel();
       _timer = Timer.periodic(
@@ -498,6 +500,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
       _timer?.cancel();
       await _videoPlayerPlatform.pause(_textureId);
     }
+    playOrPauseHandler!(value.isPlaying);
   }
 
   Future<void> _applyVolume() async {
